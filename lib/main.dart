@@ -1,44 +1,73 @@
 import 'package:flutter/material.dart';
 
-import './question.dart';
-import './answers.dart';
+import './quiz.dart';
+import './result.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _MyAppState();
   }
 }
 
 class _MyAppState extends State<MyApp> {
-  var _questionIndex = 0;
+  final _questions = const [
+    {
+      'questionText': 'What\'s your favorite color?',
+      'answers': [
+        {'text': 'Black', 'score': 10},
+        {'text': 'Blue', 'score': 5},
+        {'text': 'Green', 'score': 50},
+        {'text': 'Yellow', 'score': 1}
+      ]
+    },
+    {
+      'questionText': 'What\'s your favorite animal?',
+      'answers': [
+        {'text': 'Cat', 'score': 10},
+        {'text': 'Dolphin', 'score': 30},
+        {'text': 'Elephant', 'score': 5},
+        {'text': 'Dog', 'score': 8}
+      ]
+    },
+    {
+      'questionText': 'Who\'s your favorite instructor?',
+      'answers': [
+        {'text': 'Max', 'score': 1},
+        {'text': 'Max', 'score': 1},
+        {'text': 'Max', 'score': 1},
+        {'text': 'Max', 'score': 1}
+      ]
+    },
+  ];
 
-  void _answerQuestion() {
+  var _questionIndex = 0;
+  var totalScore = 0;
+
+  void _answerQuestion(int score) {
     setState(() {
       _questionIndex = _questionIndex + 1;
     });
     print(_questionIndex);
+
+    totalScore += score;
+
+    if (_questionIndex < _questions.length) {
+      print('we have more _questions!');
+    }
+  }
+
+  void restartGame() {
+    setState(() {
+      _questionIndex = 0;
+      totalScore = 0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    var questions = [
-      {
-        'questionText': 'What\'s your favorite color?',
-        'answers': ['Black', 'Blue', 'Green', 'Yellow']
-      },
-      {
-        'questionText': 'What\'s your favorite animal?',
-        'answers': ['Cat', 'Dolphin', 'Elephant', 'Dog']
-      },
-      {
-        'questionText': 'Who\'s your favorite instructor?',
-        'answers': ['Max', 'Max', 'Max', 'Max']
-      },
-    ];
     return MaterialApp(
       debugShowCheckedModeBanner: true,
       home: Scaffold(
@@ -54,15 +83,9 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {}),
             ],
           ),
-          body: Column(
-            children: <Widget>[
-              Question(questions[_questionIndex]['questionText']),
-              ...(questions[_questionIndex]['answers'] as List<String>)
-                  .map((answer) {
-                return Answers(answer, _answerQuestion);
-              }).toList()
-            ],
-          )),
+          body: _questionIndex < _questions.length
+              ? Quiz(_questionIndex, _answerQuestion, _questions)
+              : Result(totalScore, restartGame)),
     );
   }
 }
